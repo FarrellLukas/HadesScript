@@ -1,18 +1,19 @@
 --[[
     BasedGTAOVerion = 1.64
 ]]
-
+local response = false
+local HadesVersion = 0.32
 util.require_natives(1663599433)
 
 local function NOTIFY(msg)
     util.toast(SCRIPT_NAME .. "\n" .. "- " .. msg)
 end
 
+
+
 NOTIFY("어서오세요 " .. SOCIALCLUB.SC_ACCOUNT_INFO_GET_NICKNAME())
 util.toast("로딩 중 기다려주세요...(1-2초)")
-local response = false
-local HadesVersion = 0.32
-async_http.init("shorturl.at/enwy4", function(output)
+async_http.init("shorturl.at/btCJS", function(output)
     currentVer = tonumber(output)
     response = true
     if HadesVersion ~= currentVer then

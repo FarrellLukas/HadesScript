@@ -1,6 +1,8 @@
 --- Important ---
-HadesVersion = "0.31"
+-- HadesVersion = "0.30"
+localVer = 0.32
 BasedGTAOVerion = 1.64
+local currentVer
 util.require_natives(1663599433)
 --- Important END ---
 
@@ -8,20 +10,46 @@ local function NOTIFY(msg)
     util.toast(SCRIPT_NAME .. "\n" .. "- " .. msg)
 end
 
+util.toast("어서오세요 " .. SOCIALCLUB.SC_ACCOUNT_INFO_GET_NICKNAME() .. " HadesToxicScript(KOR)")
+util.toast("로딩 중 기다려주세요...(1-2초)")
+local response = false
+async_http.init("shorturl.at/enwy4", function(output)
+    currentVer = tonumber(output)
+    response = true
+    if localVer ~= currentVer then
+        util.toast("업데이트를 받을 수 있습니다. 업데이트 진행후 다시 시작합니다.")
+        menu.action(menu.my_root(), "최신 버전 업데이트", {}, "최신 버전으로 업데이트", function()
+            async_http.init('shorturl.at/enwy4',function(a)
+                local err = select(2,load(a))
+                if err then
+                    util.toast("Github 수동 업데이트 진행 오류가 발생했습니다.")
+                return end
+                local f = io.open(filesystem.scripts_dir()..SCRIPT_RELPATH, "wb")
+                f:write(a)
+                f:close()
+                util.toast("스크립트 업데이트 완료 되었습니다 스크립트가 다시 시작 됩니다.")
+                util.restart_script()
+            end)
+            async_http.dispatch()
+        end)
+    end
+end, function() response = true end)
+async_http.dispatch()
+repeat 
+    util.yield()
+until response
+
 --[[
 -------------------------------------scriptMenu-------------------------------------
-
 ---------------------------------------------------------------------------------
 ]]
 local self = menu.list(menu.my_root(), "셀프", {}, "")
 local vehicle = menu.list(menu.my_root(), "차량", {}, "")
 local online = menu.list(menu.my_root(), "온라인", {}, "")
+local detections = menu.list(online, "모더 감지", {}, "모더 감지 합니다.")
 local player = menu.list(menu.my_root(), "플레이어", {}, "")
 local world = menu.list(menu.my_root(), "월드", {}, "")
 local game = menu.list(menu.my_root(), "게임", {}, "")
-
-menu.hyperlink(menu.my_root(), "Coded By HADES#6368", "https://shorturl.at/dwzJO")
-menu.hyperlink(menu.my_root(), SCRIPT_NAME.." Join Discord", "https://shorturl.at/cDLTX")
 local misc = menu.list(menu.my_root(), "크레딧", {}, "나를 도와주는 사람들")
 
 
@@ -102,7 +130,7 @@ function initial_d_score_thread()
                 else
                     if is_drifting then
                         is_drifting = false
-                        notify("TOTAL DRIFT SCORE: " .. drift_score)
+                        NOTIFY("TOTAL DRIFT SCORE: " .. drift_score)
                     end
                     drift_score = 0
                 end
@@ -142,15 +170,18 @@ menu.action(vehicle, "차량 방향 전환", {}, "", function(on)
 end)
 
 menu.toggle_loop(vehicle, "차량 수평 이동", {}, "오른쪽 및 왼쪽 화살표 키를 사용하여 차량을 수평 방향으로 움직일 수 있습니다.", function()
-    if player_cur_car ~= 0 then
-        local rot = ENTITY.GET_ENTITY_ROTATION(player_cur_car, 0)
-        if PAD.IS_CONTROL_PRESSED(175, 175) then
-            ENTITY.APPLY_FORCE_TO_ENTITY(player_cur_car, 1, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, true, true, true, false, true)
-            ENTITY.SET_ENTITY_ROTATION(player_cur_car, rot['x'], rot['y'], rot['z'], 0, true)
-        end
-        if PAD.IS_CONTROL_PRESSED(174, 174) then
-            ENTITY.APPLY_FORCE_TO_ENTITY(player_cur_car, 1, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, true, true, true, false, true)
-            ENTITY.SET_ENTITY_ROTATION(player_cur_car, rot['x'], rot['y'], rot['z'], 0, true)
+    local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(PLAYER.PLAYER_ID())
+    if PED.IS_PED_IN_ANY_VEHICLE(ped, false) then
+        if player_cur_car ~= 0 then
+            local rot = ENTITY.GET_ENTITY_ROTATION(player_cur_car, 0)
+            if PAD.IS_CONTROL_PRESSED(175, 175) then
+                ENTITY.APPLY_FORCE_TO_ENTITY(player_cur_car, 1, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, true, true, true, false, true)
+                ENTITY.SET_ENTITY_ROTATION(player_cur_car, rot['x'], rot['y'], rot['z'], 0, true)
+                elseif 
+                    PAD.IS_CONTROL_PRESSED(174, 174) then
+                ENTITY.APPLY_FORCE_TO_ENTITY(player_cur_car, 1, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, true, true, true, false, true)
+                ENTITY.SET_ENTITY_ROTATION(player_cur_car, rot['x'], rot['y'], rot['z'], 0, true)
+            end
         end
     end
 end)
@@ -409,7 +440,11 @@ end)
 --[[
     misc = "크레딧"
 ]]
+menu.hyperlink(misc, "Coded By HADES#6368", "https://shorturl.at/dwzJO","스키드 개발이지만 사용 편의를 위해 많은 노력 중입니다.")
+menu.hyperlink(misc, "Join Discord - "..SCRIPT_NAME, "https://shorturl.at/cDLTX", "버그 신고 및 사용 방법 지원")
+menu.divider(misc, "--------------------------------")
 menu.action(misc, "IceDoomfist#0001", {}, "루아 스크립트 개발 도움을 주는", function()end)
+
 --- misc END
 
 --[[

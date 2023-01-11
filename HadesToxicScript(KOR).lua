@@ -1,22 +1,21 @@
---- Important ---
--- HadesVersion = "0.30"
-localVer = 0.32
-BasedGTAOVerion = 1.64
-local currentVer
+--[[
+    BasedGTAOVerion = 1.64
+]]
+
 util.require_natives(1663599433)
---- Important END ---
 
 local function NOTIFY(msg)
     util.toast(SCRIPT_NAME .. "\n" .. "- " .. msg)
 end
 
-util.toast("어서오세요 " .. SOCIALCLUB.SC_ACCOUNT_INFO_GET_NICKNAME() .. " HadesToxicScript(KOR)")
+NOTIFY("어서오세요 " .. SOCIALCLUB.SC_ACCOUNT_INFO_GET_NICKNAME())
 util.toast("로딩 중 기다려주세요...(1-2초)")
 local response = false
+local HadesVersion = 0.32
 async_http.init("shorturl.at/enwy4", function(output)
     currentVer = tonumber(output)
     response = true
-    if localVer ~= currentVer then
+    if HadesVersion ~= currentVer then
         util.toast("업데이트를 받을 수 있습니다. 업데이트 진행후 다시 시작합니다.")
         menu.action(menu.my_root(), "최신 버전 업데이트", {}, "최신 버전으로 업데이트", function()
             async_http.init('shorturl.at/enwy4',function(a)
@@ -177,8 +176,8 @@ menu.toggle_loop(vehicle, "차량 수평 이동", {}, "오른쪽 및 왼쪽 화�
             if PAD.IS_CONTROL_PRESSED(175, 175) then
                 ENTITY.APPLY_FORCE_TO_ENTITY(player_cur_car, 1, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, true, true, true, false, true)
                 ENTITY.SET_ENTITY_ROTATION(player_cur_car, rot['x'], rot['y'], rot['z'], 0, true)
-                elseif 
-                    PAD.IS_CONTROL_PRESSED(174, 174) then
+            elseif 
+                PAD.IS_CONTROL_PRESSED(174, 174) then
                 ENTITY.APPLY_FORCE_TO_ENTITY(player_cur_car, 1, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, true, true, true, false, true)
                 ENTITY.SET_ENTITY_ROTATION(player_cur_car, rot['x'], rot['y'], rot['z'], 0, true)
             end
@@ -458,7 +457,7 @@ players.on_join(function(player_id)
     menu.toggle(hadesScripts, "닌자방식 관전", { "hadesSpectate" }, "닌자 방식으로 관전 합니다.", function(on_click)
         menu.trigger_commands("spectate " .. players.get_name(player_id))
     end)
-    
+
     local malicious = menu.list(hadesScripts, "악의적인")
     local trolling = menu.list(hadesScripts, "트롤링")
     local friendly = menu.list(hadesScripts, "우호적인")
